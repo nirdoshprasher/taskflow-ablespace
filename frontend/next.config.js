@@ -4,6 +4,8 @@ const nextConfig = {
   images: {
     domains: ['api.dicebear.com'],
   },
+  // Disable static page generation — all pages are client-only (auth-gated)
+  output: undefined,
 };
 
 module.exports = nextConfig;
