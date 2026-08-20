@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Plus, Filter, ChevronDown, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
 import { tasksApi, Task, TaskStats } from '@/lib/api';
@@ -41,7 +41,6 @@ const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
 function DashboardContent() {
   const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const [tasks,           setTasks]           = useState<Task[]>([]);
   const [stats,           setStats]           = useState<TaskStats | null>(null);
@@ -51,17 +50,17 @@ function DashboardContent() {
   const [activeFilter,    setActiveFilter]    = useState('all');
   const [searchQuery,     setSearchQuery]     = useState('');
   const [priorityFilter,  setPriorityFilter]  = useState('');
+  const [categoryFilter,  setCategoryFilter]  = useState('');
   const [sortBy,          setSortBy]          = useState('newest');
 
-  // Read category from URL query param (from Projects page)
-  const [categoryFilter, setCategoryFilter] = useState(() => {
-    return '';
-  });
-
+  // Read category from URL on mount (client-side only)
   useEffect(() => {
-    const cat = searchParams?.get('category') ?? '';
-    if (cat) setCategoryFilter(cat);
-  }, [searchParams]);
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const cat = params.get('category');
+      if (cat) setCategoryFilter(decodeURIComponent(cat));
+    }
+  }, []);
   const [collapsed,       setCollapsed]       = useState<Record<string, boolean>>({});
   const [modalOpen,       setModalOpen]       = useState(false);
   const [editingTask,     setEditingTask]     = useState<Task | null>(null);
