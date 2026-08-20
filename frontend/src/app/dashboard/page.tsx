@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Plus, Filter, ChevronDown, ChevronRight } from 'lucide-react';
 import { useAuth } from '@/lib/auth-context';
@@ -14,6 +14,19 @@ import { TaskForm } from '@/components/tasks/TaskForm';
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 
+// Wrap the entire page in Suspense to handle useSearchParams
+export default function DashboardPage() {
+  return (
+    <Suspense fallback={
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'var(--bg-secondary)' }}>
+        <div className="spinner-dark" style={{ width: 36, height: 36 }} />
+      </div>
+    }>
+      <DashboardContent />
+    </Suspense>
+  );
+}
+
 const FILTER_TITLES: Record<string, string> = {
   all: 'Tasks', todo: 'To Do', in_progress: 'In Progress',
   completed: 'Completed', overdue: 'Overdue',
@@ -25,7 +38,7 @@ const SECTION_LABELS: Record<string, string> = {
 
 const priorityOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
 
-export default function DashboardPage() {
+function DashboardContent() {
   const { user, isLoading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
