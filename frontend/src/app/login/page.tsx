@@ -1,7 +1,7 @@
-// Server component — exports dynamic config so Next.js skips static prerendering
-export const dynamic = 'force-dynamic';
+import dynamic from 'next/dynamic';
 
-import LoginClient from './LoginClient';
+// Disable SSR — login page uses client-only auth context and browser APIs.
+const LoginClient = dynamic(() => import('./LoginClient'), { ssr: false });
 
 export default function LoginPage() {
   return <LoginClient />;

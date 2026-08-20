@@ -1,7 +1,8 @@
-// Server component — exports dynamic config so Next.js skips static prerendering
-export const dynamic = 'force-dynamic';
+import dynamic from 'next/dynamic';
 
-import DashboardClient from './DashboardClient';
+// Disable SSR entirely for the dashboard — it's a fully client-side authenticated page.
+// This is the reliable fix for the "useSearchParams Suspense boundary" build error in Next.js 14.
+const DashboardClient = dynamic(() => import('./DashboardClient'), { ssr: false });
 
 export default function DashboardPage() {
   return <DashboardClient />;
